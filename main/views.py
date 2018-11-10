@@ -14,8 +14,24 @@ init()
 class CallBackAPIView(APIView):
     INTENTS = [
         {
-            'intent': '',
-            'param': ''
+            'intent': 'i_welcome_ask_jobcoach_name',
+            'param': 'user_name'
+        },
+        {
+            'intent': 'i_welcome_ask_user_email',
+            'param': 'jobcoach_name'
+        },
+        {
+            'intent': 'i_welcome_ask_gender',
+            'param': 'email'
+        },
+        {
+            'intent': 'i_welcome_ask_emotions',
+            'param': 'user_gender'
+        },
+        {
+            'intent': 'i_welcome_jobcoach_contact_onboard',
+            'param': 'emotion_neg'
         }
     ]
 
