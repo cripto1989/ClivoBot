@@ -11,7 +11,7 @@ class DataUser(TimeStampedModel):
     session_id = models.CharField(max_length=400, blank=True, null=True)
     user_name = models.CharField(max_length=50, blank=True, null=True)
     jobcoach_name = models.CharField(max_length=50, blank=True, null=True)
-    user_email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     GENDER = Choices((1, 'male', _('Masculino')), (2, 'female', _('Femenino')))
     gender = models.PositiveSmallIntegerField(choices=GENDER, default=GENDER.male, blank=True, null=True)
     EMOTION = Choices((1, 'emotion_frustrated', _('Frustado')),
