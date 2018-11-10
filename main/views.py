@@ -11,6 +11,12 @@ init()
 
 
 class CallBackAPIView(APIView):
+    INTENTS= [
+        {
+            'intent': '',
+            'param': ''
+        }
+    ]
 
     def post(self, request, format=None):
         print(Fore.GREEN + json.dumps(self.request.data))
@@ -19,10 +25,6 @@ class CallBackAPIView(APIView):
         return Response(data={}, status=status.HTTP_200_OK)
 
     def validate_data(self):
-        """
-        Here we have to validate if the data is in request.data
-        :return:
-        """
         pass
 
     def save_json(self, json_data, session):
