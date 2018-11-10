@@ -8,9 +8,9 @@ from rest_framework import status
 class test(APIView):
 
     def post(self, request, format=None):
-        # print(json.dumps(self.request.data))
+        print(json.dumps(self.request.data))
         data = {
-            "fulfillmentText": "Hola dude"
+            "fulfillmentText": "Hola Fulano"
         }
         return Response(data=data,status=status.HTTP_200_OK)
 
