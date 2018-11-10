@@ -2,6 +2,7 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 from django.utils.translation import gettext as _
 from model_utils import Choices
+from django.contrib.postgres.fields import JSONField
 
 # Create your models here.
 
@@ -18,3 +19,11 @@ class DataUser(TimeStampedModel):
 
     def __str__(self):
         return "{}".format(self.session_id)
+
+
+class History(TimeStampedModel):
+    session = models.CharField(max_length=140, verbose_name="SessionID")
+    data = JSONField()
+
+    def __str__(self):
+        pass
