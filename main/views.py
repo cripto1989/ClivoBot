@@ -35,9 +35,18 @@ class CallBackAPIView(APIView):
     ]
 
     def post(self, request, format=None):
-        print(Fore.GREEN + json.dumps(self.request.data))
+        # print(Fore.GREEN + json.dumps(self.request.data))
         session = self.request.data['session']
         self.save_json(self.request.data, session)
+
+        if "queryResult" in self.request.data:
+            if "intent" in self.request.data["queryResult"]:
+                intent = self.request.data["queryResult"]["intent"]["displayName"]
+                data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
+                if len(data_filter) > 0:
+                    obj_dict = data_filter[0]
+                    param = obj_dict['param']
+                    # print(Fore.GREEN, param)
         return Response(data={}, status=status.HTTP_200_OK)
 
     def validate_data(self):
