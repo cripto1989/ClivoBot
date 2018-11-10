@@ -5,17 +5,18 @@ from rest_framework.response import Response
 from rest_framework import status
 from colorama import Fore, init
 
+from main.models import History
+
 init()
 
 
-class test(APIView):
+class CallBackAPIView(APIView):
 
     def post(self, request, format=None):
-        # print(json.dumps(self.request.data))
         print(Fore.GREEN + json.dumps(self.request.data))
-        data = {
-        }
-        return Response(data=data, status=status.HTTP_200_OK)
+        session = self.request.data['session']
+        self.save_json(self.request.data, session)
+        return Response(data={}, status=status.HTTP_200_OK)
 
     def validate_data(self):
         """
@@ -24,9 +25,7 @@ class test(APIView):
         """
         pass
 
-    def save_json(self):
-        """
-        Here we need to save the history
-        :return:
-        """
-        pass
+    def save_json(self, json_data, session):
+        History.objects.create(
+            data=json_data, session=session
+        )

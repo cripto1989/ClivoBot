@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import test
+from main.views import CallBackAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/test', test.as_view()),
+    path('api/test', CallBackAPIView.as_view(), name='callback'),
 ]
