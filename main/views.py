@@ -52,9 +52,13 @@ class CallBackAPIView(APIView):
 
     def get_or_create_data(self):
         today = datetime.date.today()
-        obj = DataUser.objects.get_or_create(created=today,
+        obj, created = DataUser.objects.get_or_create(created=today,
                                              session_id=self.request.data['session'])
         return obj
+
+    def update_data_user(self, parameter, value):
+        obj = self.get_or_create_data()
+        DataUser.objects.filter(pk=obj.id).update(**{parameter: value})
 
     def validate_data(self):
         pass
