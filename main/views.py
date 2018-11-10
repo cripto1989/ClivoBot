@@ -15,23 +15,28 @@ class CallBackAPIView(APIView):
     INTENTS = [
         {
             'intent': 'i_welcome_ask_jobcoach_name',
-            'param': 'user_name'
+            'param': 'user_name',
+            'validate': False
         },
         {
             'intent': 'i_welcome_ask_user_email',
-            'param': 'jobcoach_name'
+            'param': 'jobcoach_name',
+            'validate': False
         },
         {
             'intent': 'i_welcome_ask_gender',
-            'param': 'email'
+            'param': 'email',
+            'validate': False
         },
         {
             'intent': 'i_welcome_ask_emotions',
-            'param': 'user_gender'
+            'param': 'user_gender',
+            'validate': False
         },
         {
             'intent': 'i_welcome_jobcoach_contact_onboard',
-            'param': 'emotion_neg'
+            'param': 'emotion_neg',
+            'validate': False
         }
     ]
 
@@ -47,7 +52,12 @@ class CallBackAPIView(APIView):
                 if len(data_filter) > 0:
                     obj_dict = data_filter[0]
                     param = obj_dict['param']
-                    # print(Fore.GREEN, param)
+                    validate = obj_dict['validate']
+                    if "parameters" in self.request.data["queryResult"]:
+                        value = self.request.data["queryResult"]["parameters"][param]
+                        if validate:
+                            self.update_data_user(param, value)
+                        # print(Fore.GREEN, value)
         return Response(data={}, status=status.HTTP_200_OK)
 
     def get_or_create_data(self):
