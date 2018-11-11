@@ -1,4 +1,5 @@
 import datetime
+import json
 import re
 import requests
 import string
@@ -18,69 +19,96 @@ class CallBackAPIView(APIView):
     INTENTS = [
         {
             'intent': 'i_welcome_ask_jobcoach_name',
-            'param': 'user_name',
-            'validate': False
+            'param': ['user_name'],
+            'validate': False,
+            'chat': 0
         },
         {
             'intent': 'i_welcome_ask_user_email',
-            'param': 'jobcoach_name',
-            'validate': False
+            'param': ['jobcoach_name'],
+            'validate': False,
+            'chat': 0
         },
         {
             'intent': 'i_welcome_ask_gender',
-            'param': 'email',
-            'validate': False
+            'param': ['email'],
+            'validate': False,
+            'chat': 0
         },
         {
             'intent': 'i_welcome_ask_emotions',
-            'param': 'user_gender',
-            'validate': True
+            'param': ['user_gender'],
+            'validate': True,
+            'chat': 0
         },
         {
             'intent': 'i_welcome_jobcoach_contact_onboard',
-            'param': 'emotion_neg',
-            'validate': True
+            'param': ['emotion_neg'],
+            'validate': True,
+            'chat': 0
         },
+        # Hola
         {
             'intent': 'i_starting_day_ask_emotions',
-            'param': '',
-            'validate': False
-        },
-        {
-            'intent': 'i_jobcoach_contact',
-            'param': 'emotion_neg',
-            'validate': True
+            'validate': False,
+            'chat': 0
         },
         {
             'intent': 'i_starting_day_ask_workspace',
-            'param': 'emotion_pos',
-            'validate': True
-        }
+            'param': ['emotion_neg', 'emotions_pos'],
+            'validate': True,
+            'chat': 1
+        },
+        {
+            'intent': 'i_jobcoach_contact',
+            'param': ['emotion_neg'],
+            'validate': True,
+            'chat': 1
+        },
     ]
 
     def post(self, request, format=None):
         session = self.request.data['session']
         self.save_json(self.request.data, session)
-
+        # print(json.dumps(self.request.data))
         if "queryResult" in self.request.data:
             if "intent" in self.request.data["queryResult"]:
                 intent = self.request.data["queryResult"]["intent"]["displayName"]
-                print(Fore.LIGHTGREEN_EX, intent)
-                print(Fore.BLUE, self.request.data["queryResult"]["parameters"])
+                print(Fore.BLUE, intent)
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
                 if len(data_filter) > 0:
                     obj_dict = data_filter[0]
-                    param = obj_dict['param']
-                    validate = obj_dict['validate']
-                    if "parameters" in self.request.data["queryResult"]:
-                        value = self.request.data["queryResult"]["parameters"][param]
-                        if validate:
-                            self.validate_data(param, value)
+                    if 'param' in obj_dict:
+                        for p in obj_dict['param']:
+                            if p in self.request.data["queryResult"]["parameters"]:
+                                param = p
+                        validate = obj_dict['validate']
+                        chat = obj_dict['chat']
+                        if chat > 0:
+                            value = self.request.data["queryResult"]["parameters"][param]
+                            print(Fore.RED, value)
+                            if validate:
+                                self.validate_data_daily_emotion(param, value, chat)
+                            else:
+                                self.create_emotion(param, value, chat)
                         else:
-                            self.update_data_user(param, value)
+                            if "parameters" in self.request.data["queryResult"]:
+                                value = self.request.data["queryResult"]["parameters"][param]
+                                print(Fore, "ando aca")
+                                if validate:
+                                    self.validate_data(param, value)
+                                else:
+                                    self.update_data_user(param, value)
+
         response = {
             "fulfillmentMessages": self.generate_response(data=self.request.data["queryResult"]["fulfillmentMessages"])}
         return Response(data=response, status=status.HTTP_200_OK, content_type="application/json; charset=UTF-8")
+
+    def create_emotion(self, param, value, chat):
+        print(Fore.GREEN, param)
+        print(Fore.GREEN, value)
+        print(Fore.GREEN, chat)
+        pass
 
     def get_or_create_data(self):
         obj, created = DataUser.objects.get_or_create(session_id=self.request.data['session'])
@@ -105,6 +133,24 @@ class CallBackAPIView(APIView):
             elif value == "irritado":
                 self.update_data_user(param, 3)
 
+    def validate_data_daily_emotion(self, param, value, chat):
+        print(Fore.GREEN, param)
+        print(Fore.GREEN, value)
+        if param == "emotion_neg":
+            value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
+            if value == "triste":
+                self.create_emotion(param, 4, chat)
+            elif value == "frustrado":
+                self.create_emotion(param, 3, chat)
+            elif value == "irritado":
+                self.create_emotion(param, 5, chat)
+        elif param == "emotions_pos":
+            value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
+            if value == "feliz":
+                self.create_emotion(param, 1, chat)
+            elif value == "emocionado":
+                self.create_emotion(param, 2, chat)
+
     def save_json(self, json_data, session):
         History.objects.create(
             data=json_data, session=session
@@ -125,7 +171,7 @@ class CallBackAPIView(APIView):
         return data
 
     def validate_string(self, phrase):
-        phrase_split = re.split(' |, |\n', phrase)
+        phrase_split = re.split(' |, |! |\n', phrase)
         words = [word for word in phrase_split if re.match("\$\w+$", word)]
         if len(words) > 0:
             for word in words:
