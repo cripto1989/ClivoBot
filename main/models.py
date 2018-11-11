@@ -15,7 +15,7 @@ class DataUser(TimeStampedModel):
     GENDER = Choices((1, 'male', _('Masculino')), (2, 'female', _('Femenino')))
     user_gender = models.PositiveSmallIntegerField(choices=GENDER, default=GENDER.male, blank=True, null=True)
     EMOTION = Choices((1, 'emotion_frustrated', _('Frustado')),
-                      (2, 'emotion_sad', _('Triste')),(1, 'emotion_irritated', _('Irritado')))
+                      (2, 'emotion_sad', _('Triste')), (3, 'emotion_irritated', _('Irritado')))
     emotion_neg = models.PositiveSmallIntegerField(choices=EMOTION, default=EMOTION.emotion_frustrated,
                                                blank=True, null=True)
 
