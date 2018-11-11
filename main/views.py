@@ -65,6 +65,35 @@ class CallBackAPIView(APIView):
             'validate': True,
             'chat': 1
         },
+        {
+            'intent': 'i_first_ask_obstacles',
+            'param': ['emotions_pos', 'emotion_neg'],
+            'validate': True,
+            'chat': 2
+        },
+        {
+            'intent': 'i_first_describes_problem_bothers',
+            'param': ['first_problem'],
+            'validate': False,
+            'chat': 2
+        },
+        {
+            'intent': 'i_first_checking_ask_alerts_total',
+            'validate': False,
+            'chat': 2
+        },
+        {
+            'intent': 'i_first_ask_alerts_critical',
+            'param': ['alerts_total'],
+            'validate': False,
+            'chat': 2
+        },
+        {
+            'intent': 'i_first_ask_alerts_non-critical',
+            'param': ['alerts_critical'],
+            'validate': False,
+            'chat': 2
+        },
     ]
 
     def post(self, request, format=None):
