@@ -65,6 +65,7 @@ class CallBackAPIView(APIView):
             'validate': False,
             'chat': 1
         },
+        # 1 hr
         {
             'intent': 'i_first_ask_obstacles',
             'param': ['emotions_pos', 'emotion_neg'],
