@@ -1,5 +1,6 @@
 import datetime
 import re
+import requests
 import string
 
 from rest_framework.views import APIView
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from colorama import Fore, init
 
+from ClivoBot.settings import DIALOG_ACCESS_TOKEN
 from main.models import History, DataUser
 
 init()
@@ -119,3 +121,18 @@ class CallBackAPIView(APIView):
         else:
             return phrase
 
+
+class Event:
+
+    @classmethod
+    def event(self):
+        r = requests.post(
+            url="https://dialogflow.googleapis.com/v2/projects/clivoes/agent/sessions/b714481e-4da1-a49a-4728-c408f5fac168:detectIntent",
+            headers={
+                "Authorization": "Bearer {}".format(DIALOG_ACCESS_TOKEN),
+                "Content-Type": "application/json"
+            }
+        )
+        print(r)
+        print(r.status_code)
+        print(r.text)
