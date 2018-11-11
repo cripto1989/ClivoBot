@@ -92,3 +92,7 @@ class CallBackAPIView(APIView):
         History.objects.create(
             data=json_data, session=session
         )
+
+    def fetch_value(self, param):
+        obj = self.get_or_create_data()
+        return getattr(obj, param)
