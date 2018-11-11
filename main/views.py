@@ -104,11 +104,12 @@ class CallBackAPIView(APIView):
             lista = []
             if 'text' in messages['text']:
                 for x in messages['text']['text']:
-                     lista.append(self.validate_string(messages['text'])
+                     lista.append(self.validate_string(messages['text']))
             messages['text']['text'] = lista
         return data
 
     def validate_string(self, phrase):
+        print(Fore.RED, phrase)
         phrase_split = phrase.split()
         words = [word for word in phrase_split if re.match("\$\w+$", word)]
         if len(words) > 0:
