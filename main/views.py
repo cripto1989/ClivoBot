@@ -10,7 +10,7 @@ from rest_framework import status
 from colorama import Fore, init
 
 from ClivoBot.settings import DIALOG_ACCESS_TOKEN
-from main.models import History, DataUser
+from main.models import History, DataUser, DailyEmotions
 
 init()
 
@@ -105,10 +105,9 @@ class CallBackAPIView(APIView):
         return Response(data=response, status=status.HTTP_200_OK, content_type="application/json; charset=UTF-8")
 
     def create_emotion(self, param, value, chat):
-        print(Fore.GREEN, param)
-        print(Fore.GREEN, value)
-        print(Fore.GREEN, chat)
-        pass
+        obj, created = DailyEmotions.objects.get_or_create(flow=chat, session_id=self.request.data['session'],
+                                                           created__date=datetime.date.today())
+        DailyEmotions.objects.filter(pk=obj.id).update(**{param: value})
 
     def get_or_create_data(self):
         obj, created = DataUser.objects.get_or_create(session_id=self.request.data['session'])
