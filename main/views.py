@@ -1,5 +1,5 @@
 import datetime
-import json
+import string
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -79,8 +79,14 @@ class CallBackAPIView(APIView):
                 self.update_data_user(param, 1)
             elif value.lower == "femenino":
                 self.update_data_user(param, 2)
-        # elif param == "emotion_neg":
-        #     pass
+        elif param == "emotion_neg":
+            value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
+            if value == "triste":
+                self.update_data_user(param, 2)
+            elif value == "frustrado":
+                self.update_data_user(param, 1)
+            elif value == "irritado":
+                self.update_data_user(param, 3)
 
     def save_json(self, json_data, session):
         History.objects.create(
