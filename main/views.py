@@ -48,6 +48,8 @@ class CallBackAPIView(APIView):
         if "queryResult" in self.request.data:
             if "intent" in self.request.data["queryResult"]:
                 intent = self.request.data["queryResult"]["intent"]["displayName"]
+                print(Fore.LIGHTGREEN_EX, intent)
+                print(Fore.BLUE, self.request.data["queryResult"]["parameters"])
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
                 if len(data_filter) > 0:
                     obj_dict = data_filter[0]
