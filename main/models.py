@@ -44,7 +44,8 @@ class DailyEmotions(TimeStampedModel):
     alerts_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Criticals")
     alerts_non_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Non-Critial")
     work_dislike = models.TextField(max_length=500, blank=True, null=True, verbose_name="Work Dislike")
-    session_id = models.ForeignKey(DataUser, on_delete=models.CASCADE)
+    session_id = models.TextField(blank=True, null=True)
+    data_user = models.ForeignKey(DataUser, on_delete=models.CASCADE)
 
     def __str__(self):
         pass
