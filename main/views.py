@@ -42,7 +42,6 @@ class CallBackAPIView(APIView):
     ]
 
     def post(self, request, format=None):
-        # print(Fore.GREEN + json.dumps(self.request.data))
         session = self.request.data['session']
         self.save_json(self.request.data, session)
 
@@ -60,8 +59,9 @@ class CallBackAPIView(APIView):
                             self.validate_data(param, value)
                         else:
                             self.update_data_user(param, value)
-        response = {"fulfillmentMessages": self.generate_response(data=self.request.data["queryResult"]["fulfillmentMessages"])}
-        return Response(data=response, status=status.HTTP_200_OK)
+        response = {
+            "fulfillmentMessages": self.generate_response(data=self.request.data["queryResult"]["fulfillmentMessages"])}
+        return Response(data=response, status=status.HTTP_200_OK, content_type="application/json; charset=UTF-8")
 
     def get_or_create_data(self):
         today = datetime.date.today()
@@ -70,12 +70,10 @@ class CallBackAPIView(APIView):
         return obj
 
     def update_data_user(self, parameter, value):
-        # print(Fore.RED, "Llego a crear")
         obj = self.get_or_create_data()
         DataUser.objects.filter(pk=obj.id).update(**{parameter: value})
 
     def validate_data(self, param, value):
-        print(Fore.BLUE, value)
         if param == "user_gender":
             if value.lower() == "masculino":
                 self.update_data_user(param, 1)
@@ -102,24 +100,22 @@ class CallBackAPIView(APIView):
     def generate_response(self, data):
         for messages in data:
             lista = []
-            if 'text' in messages['text']:
-                for x in messages['text']['text']:
-                     lista.append(self.validate_string(messages['text']))
-            messages['text']['text'] = lista
+            if 'text' in messages:
+                if 'text' in messages['text']:
+                    for x in messages['text']['text']:
+                        lista.append(self.validate_string(x))
+                    messages['text']['text'] = lista
         return data
 
     def validate_string(self, phrase):
-        print(Fore.RED, phrase)
-        phrase_split = phrase.split()
+        phrase_split = re.split(' |, |\n', phrase)
         words = [word for word in phrase_split if re.match("\$\w+$", word)]
         if len(words) > 0:
             for word in words:
-                print(Fore.RED, word)
                 field = word[1:]
-                print(Fore.YELLOW, field)
                 new_word = self.fetch_value(field)
-                print(Fore.GREEN, new_word)
-                phrase.replace(word, new_word)
-            return phrase.decode('latin1')
+                phrase = phrase.replace(word, new_word)
+            return phrase
         else:
-            return phrase.decode('latin1')
+            return phrase
+
