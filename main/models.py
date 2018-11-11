@@ -29,3 +29,22 @@ class History(TimeStampedModel):
 
     def __str__(self):
         pass
+
+
+class DailyEmotions(TimeStampedModel):
+    EMOTION = Choices((1, 'emotion_happy', _('Feliz')), (2, 'emotion_excited', _('Emocionado')),
+                      (3, 'emotion_frustrated', _('Frustado')), (4, 'emotion_sad', _('Triste')),
+                      (5, 'emotion_irritated', _('Irritado')))
+    emotion_pos = models.PositiveSmallIntegerField(choices=EMOTION, default=EMOTION.emotion_happy,
+                                                   blank=True, null=True)
+    emotion_neg = models.PositiveSmallIntegerField(choices=EMOTION, default=EMOTION.emotion_frustrated,
+                                                   blank=True, null=True)
+    first_obstacle = models.TextField(max_length=500, blank=True, null=True, verbose_name="First Obstacle")
+    alerts_total = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Total")
+    alerts_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Criticals")
+    alerts_non_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Non-Critial")
+    work_dislike = models.TextField(max_length=500, blank=True, null=True, verbose_name="Work Dislike")
+    session_id = models.ForeignKey(DataUser, on_delete=models.CASCADE)
+
+    def __str__(self):
+        pass

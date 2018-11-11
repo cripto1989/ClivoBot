@@ -38,6 +38,21 @@ class CallBackAPIView(APIView):
             'intent': 'i_welcome_jobcoach_contact_onboard',
             'param': 'emotion_neg',
             'validate': True
+        },
+        {
+            'intent': 'i_starting_day_ask_emotions',
+            'param': '',
+            'validate': False
+        },
+        {
+            'intent': 'i_jobcoach_contact',
+            'param': 'emotion_neg',
+            'validate': True
+        },
+        {
+            'intent': 'i_starting_day_ask_workspace',
+            'param': 'emotion_pos',
+            'validate': True
         }
     ]
 
@@ -66,9 +81,7 @@ class CallBackAPIView(APIView):
         return Response(data=response, status=status.HTTP_200_OK, content_type="application/json; charset=UTF-8")
 
     def get_or_create_data(self):
-        today = datetime.date.today()
-        obj, created = DataUser.objects.get_or_create(created__date=today,
-                                             session_id=self.request.data['session'])
+        obj, created = DataUser.objects.get_or_create(session_id=self.request.data['session'])
         return obj
 
     def update_data_user(self, parameter, value):
