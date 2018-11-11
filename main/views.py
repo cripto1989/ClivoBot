@@ -102,3 +102,8 @@ class CallBackAPIView(APIView):
     def fetch_value(self, param):
         obj = self.get_or_create_data()
         return getattr(obj, param)
+
+    def generate_response(self):
+        for messages in self.request.data["queryResult"]["fulfillmentMessages"]:
+            if 'text' in messages:
+                messages["text"] = self.validate_string(messages['text'])
