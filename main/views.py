@@ -59,7 +59,13 @@ class CallBackAPIView(APIView):
                             self.validate_data(param, value)
                         else:
                             self.update_data_user(param, value)
-        return Response(data={}, status=status.HTTP_200_OK)
+        """                            
+        for r in self.request.data["queryResult"]["fulfillmentMessages"]:
+            print(Fore.GREEN, r["text"]["text"][0].decode('latin1'))
+        response = {"fulfillmentMessages": self.request.data["queryResult"]["fulfillmentMessages"]}
+        """
+        response = {}
+        return Response(data=response, status=status.HTTP_200_OK)
 
     def get_or_create_data(self):
         today = datetime.date.today()
