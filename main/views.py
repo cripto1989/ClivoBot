@@ -60,9 +60,9 @@ class CallBackAPIView(APIView):
             'chat': 1
         },
         {
-            'intent': 'i_jobcoach_contact',
-            'param': ['emotion_neg'],
-            'validate': True,
+            'intent': 'i_starting_day_describe_problem',
+            'param': ['initial_change'],
+            'validate': False,
             'chat': 1
         },
     ]
@@ -70,7 +70,7 @@ class CallBackAPIView(APIView):
     def post(self, request, format=None):
         session = self.request.data['session']
         self.save_json(self.request.data, session)
-        # print(json.dumps(self.request.data))
+        print(json.dumps(self.request.data))
         if "queryResult" in self.request.data:
             if "intent" in self.request.data["queryResult"]:
                 intent = self.request.data["queryResult"]["intent"]["displayName"]
