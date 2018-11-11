@@ -40,6 +40,7 @@ class DailyEmotions(TimeStampedModel):
     emotion_neg = models.PositiveSmallIntegerField(choices=EMOTION, blank=True, null=True)
     flow = models.PositiveSmallIntegerField(choices=FLOW, blank=True, null=True)
     first_obstacle = models.TextField(max_length=500, blank=True, null=True, verbose_name="First Obstacle")
+    initial_change = models.TextField(max_length=500, blank=True, null=True, verbose_name="initial Change")
     alerts_total = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Total")
     alerts_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Criticals")
     alerts_non_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Non-Critial")
