@@ -101,8 +101,11 @@ class CallBackAPIView(APIView):
 
     def generate_response(self, data):
         for messages in data:
-            if 'text' in messages:
-                messages["text"] = self.validate_string(messages['text'])
+            lista = []
+            if 'text' in messages['text']:
+                for x in messages['text']['text']:
+                     lista.append(self.validate_string(messages['text'])
+            messages['text']['text'] = lista
         return data
 
     def validate_string(self, phrase):
