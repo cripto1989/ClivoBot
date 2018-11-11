@@ -1,4 +1,5 @@
 import datetime
+import re
 import string
 
 from rest_framework.views import APIView
@@ -102,3 +103,18 @@ class CallBackAPIView(APIView):
     def fetch_value(self, param):
         obj = self.get_or_create_data()
         return getattr(obj, param)
+
+    def validate_string(self, phrase):
+        phrase_split = phrase.split()
+        words = [word for word in phrase_split if re.match("\$\w+$", word)]
+        if len(words) > 0:
+            for word in words:
+                print(Fore.RED, word)
+                field = word[1:]
+                print(Fore.YELLOW, field)
+                new_word = self.fetch_value(field)
+                print(Fore.GREEN, new_word)
+                phrase.replace(word, new_word)
+            return phrase.decode('latin1')
+        else:
+            return phrase.decode('latin1')
