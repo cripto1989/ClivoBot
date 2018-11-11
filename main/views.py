@@ -127,12 +127,18 @@ class CallBackAPIView(APIView):
 class Event:
 
     @classmethod
-    def event(self):
+    def event(cls):
         r = requests.post(
-            url="https://dialogflow.googleapis.com/v2/projects/clivoes/agent/sessions/b714481e-4da1-a49a-4728-c408f5fac168:detectIntent",
+            url="https://api.dialogflow.com/v1/",
             headers={
                 "Authorization": "Bearer {}".format(DIALOG_ACCESS_TOKEN),
                 "Content-Type": "application/json"
+            },
+            data={
+                "v": "20150910",
+                "lang": "es",
+                "sessionId": "12345",
+                "timezone": "America/Chicago"
             }
         )
         print(r)
