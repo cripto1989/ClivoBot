@@ -1,4 +1,5 @@
 import datetime
+import re
 import string
 
 from rest_framework.views import APIView
@@ -107,3 +108,18 @@ class CallBackAPIView(APIView):
         for messages in self.request.data["queryResult"]["fulfillmentMessages"]:
             if 'text' in messages:
                 messages["text"] = self.validate_string(messages['text'])
+
+    def validate_string(self, phrase):
+        phrase_split = phrase.split()
+        words = [word for word in phrase_split if re.match("\$\w+$", word)]
+        if len(words) > 0:
+            for word in words:
+                print(Fore.RED, word)
+                field = word[1:]
+                print(Fore.YELLOW, field)
+                new_word = self.fetch_value(field)
+                print(Fore.GREEN, new_word)
+                phrase.replace(word, new_word)
+            return phrase.decode('latin1')
+        else:
+            return phrase.decode('latin1')
