@@ -27,7 +27,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['2cce1491.ngrok.io']
+ALLOWED_HOSTS = ['3897923d.ngrok.io']
 
 
 # Application definition
@@ -126,3 +126,5 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DIALOG_ACCESS_TOKEN = env('ACCESS_TOKEN')
