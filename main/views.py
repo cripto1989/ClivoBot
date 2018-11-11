@@ -62,7 +62,7 @@ class CallBackAPIView(APIView):
 
     def get_or_create_data(self):
         today = datetime.date.today()
-        obj, created = DataUser.objects.get_or_create(created=today,
+        obj, created = DataUser.objects.get_or_create(created__date=today,
                                              session_id=self.request.data['session'])
         return obj
 
