@@ -36,7 +36,7 @@ class DailyEmotions(TimeStampedModel):
                       (5, 'emotion_irritated', _('Irritado')))
     FLOW = Choices((1, 'starting_day', _('Hola')), (2, 'first_check_in', _('1hr')),
                    (3, 'second_check_in', _('2hrs')))
-    emotion_pos = models.PositiveSmallIntegerField(choices=EMOTION, blank=True, null=True)
+    emotions_pos = models.PositiveSmallIntegerField(choices=EMOTION, blank=True, null=True)
     emotion_neg = models.PositiveSmallIntegerField(choices=EMOTION, blank=True, null=True)
     flow = models.PositiveSmallIntegerField(choices=FLOW, blank=True, null=True)
     first_obstacle = models.TextField(max_length=500, blank=True, null=True, verbose_name="First Obstacle")
