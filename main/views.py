@@ -68,7 +68,7 @@ class CallBackAPIView(APIView):
         return obj
 
     def update_data_user(self, parameter, value):
-        print(Fore.RED, "Llego a crear")
+        # print(Fore.RED, "Llego a crear")
         obj = self.get_or_create_data()
         DataUser.objects.filter(pk=obj.id).update(**{parameter: value})
 
@@ -77,7 +77,7 @@ class CallBackAPIView(APIView):
         if param == "user_gender":
             if value.lower() == "masculino":
                 self.update_data_user(param, 1)
-            elif value.lower == "femenino":
+            elif value.lower() == "femenino":
                 self.update_data_user(param, 2)
         elif param == "emotion_neg":
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
