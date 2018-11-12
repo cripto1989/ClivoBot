@@ -95,6 +95,37 @@ class CallBackAPIView(APIView):
             'validate': False,
             'chat': 2
         },
+        # 2hr
+        {
+            'intent': 'i_second_checkin_ask_alerts_critical',
+            'param': ['alerts_total'],
+            'validate': False,
+            'chat': 3
+        },
+        {
+            'intent': 'i_second_checkin_ask_alerts_none-critical',
+            'param': ['alerts_critical'],
+            'validate': False,
+            'chat': 3
+        },
+        {
+            'intent': 'i_second_checkin_ask_emotions',
+            'param': ['alerts_none-critical'],
+            'validate': True,
+            'chat': 3
+        },
+        {
+            'intent': 'i_second_checkin_taste_work',
+            'param': ['emotions_pos'],
+            'validate': True,
+            'chat': 3
+        },
+        {
+            'intent': 'i_jobcoach_contact',
+            'param': ['second_dislike'],
+            'validate': True,
+            'chat': 3
+        },
     ]
 
     def post(self, request, format=None):
