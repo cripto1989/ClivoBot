@@ -44,7 +44,7 @@ class DailyEmotions(TimeStampedModel):
     alerts_total = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Total")
     alerts_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Criticals")
     alerts_non_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Non-Critial")
-    work_dislike = models.TextField(max_length=500, blank=True, null=True, verbose_name="Work Dislike")
+    second_dislike = models.TextField(max_length=500, blank=True, null=True, verbose_name="Work Dislike")
     session_id = models.TextField(blank=True, null=True)
 
     def __str__(self):
