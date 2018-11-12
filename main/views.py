@@ -132,6 +132,12 @@ class CallBackAPIView(APIView):
             'param': ['emotion_neg', 'second_dislike'],
             'validate': True,
             'chat': 3
+        },
+        # 2 min
+        {
+            'intent': 'i_response_again',
+            'validate': False,
+            'chat': 0
         }
     ]
 
