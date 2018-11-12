@@ -3,6 +3,7 @@ import json
 import re
 import requests
 import string
+from django.db.models import Avg, Sum
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -249,6 +250,42 @@ class CallBackAPIView(APIView):
             return phrase
         else:
             return phrase
+
+    def get(self, request):
+        email = self.request.query_params.get('email')
+        date = self.request.query_params.get('date')
+        du = DataUser.objects.get(email=email)
+        de = DailyEmotions.objects.filter(session_id=du.session_id, created__date=date)
+        print(de.count())
+        alert_total = 0
+        alerts_critical = 0
+        alerts_non_critical = 0
+        work_change = ""
+        first_problem = ""
+        work_dislike = ""
+        for daily in de:
+            if isinstance(daily.alerts_total, str):
+                alert_total += int(daily.alerts_total)
+            if isinstance(daily.alerts_critical, str):
+                alerts_critical += int(daily.alerts_critical)
+            if isinstance(daily.alerts_non_critical, str):
+                alerts_non_critical += int(daily.alerts_non_critical)
+            if isinstance(daily.initial_change, str):
+                work_change = daily.initial_change
+            if isinstance(daily.first_problem, str):
+                first_problem = daily.first_problem
+            if isinstance(daily.second_dislike, str):
+                work_dislike = daily.second_dislike
+        data = {
+            "alert_total": alert_total,
+            "alerts_critical": alerts_critical,
+            "alerts_non_critical": alerts_non_critical,
+            "work_change": work_change,
+            "first_problem": first_problem,
+            "work_dislike": work_dislike
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+
 
 
 class Event:

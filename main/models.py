@@ -27,7 +27,7 @@ class History(TimeStampedModel):
     data = JSONField()
 
     def __str__(self):
-        pass
+        return "{}".format(self.id)
 
 
 class DailyEmotions(TimeStampedModel):
@@ -48,4 +48,4 @@ class DailyEmotions(TimeStampedModel):
     session_id = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        pass
+        return "{}".format(self.id)
