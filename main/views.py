@@ -130,7 +130,7 @@ class CallBackAPIView(APIView):
         {
             'intent': 'i_jobcoach_contact',
             'param': ['emotion_neg', 'second_dislike'],
-            'validate': False,
+            'validate': True,
             'chat': 3
         }
     ]
