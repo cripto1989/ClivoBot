@@ -263,6 +263,9 @@ class CallBackAPIView(APIView):
         work_change = ""
         first_problem = ""
         work_dislike = ""
+        emotion_hola = ""
+        emotion_1hr = ""
+        emotion_2hr = ""
         for daily in de:
             if isinstance(daily.alerts_total, str):
                 alert_total += int(daily.alerts_total)
@@ -276,13 +279,26 @@ class CallBackAPIView(APIView):
                 first_problem = daily.first_problem
             if isinstance(daily.second_dislike, str):
                 work_dislike = daily.second_dislike
+        for daily in de:
+            if daily.flow == DailyEmotions.FLOW.starting_day:
+                if daily.emotions_pos or daily.emotion_neg:
+                    emotion_hola = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
+            if daily.flow == DailyEmotions.FLOW.first_check_in:
+                if daily.emotions_pos or daily.emotion_neg:
+                    emotion_1hr = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
+            if daily.flow == DailyEmotions.FLOW.second_check_in:
+                if daily.emotions_pos or daily.emotion_neg:
+                    emotion_2hr = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
         data = {
             "alert_total": alert_total,
             "alerts_critical": alerts_critical,
             "alerts_non_critical": alerts_non_critical,
             "work_change": work_change,
             "first_problem": first_problem,
-            "work_dislike": work_dislike
+            "work_dislike": work_dislike,
+            "emotion_hola": emotion_hola,
+            "emotion_1hr": emotion_1hr,
+            "emotion_2hr": emotion_2hr
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
