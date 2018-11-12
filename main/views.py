@@ -254,7 +254,10 @@ class CallBackAPIView(APIView):
     def get(self, request):
         email = self.request.query_params.get('email')
         date = self.request.query_params.get('date')
-        du = DataUser.objects.get(email=email)
+        try:
+            du = DataUser.objects.get(email=email)
+        except Exception as e:
+            return Response(data={'text':'User doesn\'t exists'}, status=status.HTTP_400_BAD_REQUEST)
         de = DailyEmotions.objects.filter(session_id=du.session_id, created__date=date)
         print(de.count())
         alert_total = 0
