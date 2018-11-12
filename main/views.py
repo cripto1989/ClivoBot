@@ -116,7 +116,7 @@ class CallBackAPIView(APIView):
         },
         {
             'intent': 'i_second_checkin_ask_emotions',
-            'param': ['alerts_none-critical'],
+            'param': ['alerts_non-critical'],
             'validate': True,
             'chat': 3
         },
