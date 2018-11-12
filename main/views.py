@@ -95,6 +95,12 @@ class CallBackAPIView(APIView):
             'validate': False,
             'chat': 2
         },
+        {
+            'intent': 'i_first_checkin_let\'s_work',
+            'param': ['alerts_non-critical'],
+            'validate': True,
+            'chat': 2
+        },
         # 2hr
         {
             'intent': 'i_second_checkin_ask_alerts_critical',
@@ -125,7 +131,7 @@ class CallBackAPIView(APIView):
             'param': ['second_dislike'],
             'validate': True,
             'chat': 3
-        },
+        }
     ]
 
     def post(self, request, format=None):
@@ -210,6 +216,8 @@ class CallBackAPIView(APIView):
                 self.create_emotion(param, 1, chat)
             elif value == "emocionado":
                 self.create_emotion(param, 2, chat)
+        elif param == "alerts_non-critical":
+            self.create_emotion("alerts_non_critical", value, chat)
 
     def save_json(self, json_data, session):
         History.objects.create(
