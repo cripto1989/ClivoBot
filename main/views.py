@@ -130,7 +130,7 @@ class CallBackAPIView(APIView):
         {
             'intent': 'i_jobcoach_contact',
             'param': ['emotion_neg', 'second_dislike'],
-            'validate': True,
+            'validate': False,
             'chat': 3
         }
     ]
@@ -219,6 +219,8 @@ class CallBackAPIView(APIView):
                 self.create_emotion(param, 2, chat)
         elif param == "alerts_non-critical":
             self.create_emotion("alerts_non_critical", value, chat)
+        elif param == "second_dislike":
+            self.create_emotion("second_dislike", value, chat)
 
     def save_json(self, json_data, session):
         History.objects.create(
@@ -269,6 +271,7 @@ class CallBackAPIView(APIView):
         emotion_hola = ""
         emotion_1hr = ""
         emotion_2hr = ""
+        work_taste = True
         for daily in de:
             if isinstance(daily.alerts_total, str):
                 alert_total += int(daily.alerts_total)
@@ -292,6 +295,8 @@ class CallBackAPIView(APIView):
             if daily.flow == DailyEmotions.FLOW.second_check_in:
                 if daily.emotions_pos or daily.emotion_neg:
                     emotion_2hr = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
+                if daily.second_dislike:
+                    work_taste = False
         data = {
             "alert_total": alert_total,
             "alerts_critical": alerts_critical,
@@ -301,7 +306,8 @@ class CallBackAPIView(APIView):
             "work_dislike": work_dislike,
             "emotion_hola": emotion_hola,
             "emotion_1hr": emotion_1hr,
-            "emotion_2hr": emotion_2hr
+            "emotion_2hr": emotion_2hr,
+            "work_taste": work_taste
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
