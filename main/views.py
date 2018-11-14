@@ -110,7 +110,7 @@ class CallBackAPIView(APIView):
             'chat': 3
         },
         {
-            'intent': 'i_second_checkin_ask_alerts_none-critical',
+            'intent': 'i_second_checkin_ask_alerts_non-critical',
             'param': ['alerts_critical'],
             'validate': False,
             'chat': 3
@@ -122,7 +122,7 @@ class CallBackAPIView(APIView):
             'chat': 3
         },
         {
-            'intent': 'i_second_checkin_taste_work',
+            'intent': 'i_second_checkin_ask_taste_work',
             'param': ['emotions_pos'],
             'validate': True,
             'chat': 3
@@ -155,7 +155,8 @@ class CallBackAPIView(APIView):
                     if 'param' in obj_dict:
                         for p in obj_dict['param']:
                             if p in self.request.data["queryResult"]["parameters"]:
-                                param = p
+                                if len(self.request.data["queryResult"]["parameters"][p]) > 0:
+                                    param = p
                         validate = obj_dict['validate']
                         chat = obj_dict['chat']
                         if chat > 0:
