@@ -260,6 +260,21 @@ class CallBackAPIView(APIView):
         else:
             return phrase
 
+    def get_user_slack(self, data):
+        """
+        This method return slack id included in "originalDetectIntentRequest" key
+        :param data: dict originalDetectIntentRequest
+        :return: ID slack DE21HHWR4
+        """
+        if 'payload' in data:
+            if 'data' in data['payload']:
+                if 'user' in data['payload']['data']:
+                    user = data['payload']['data']['user']
+                    if isinstance(user, str):
+                        return user
+                    elif isinstance(user, dict):
+                        return user['id']
+
     def get(self, request):
         email = self.request.query_params.get('email')
         date = self.request.query_params.get('date')
@@ -317,7 +332,6 @@ class CallBackAPIView(APIView):
             "work_taste": work_taste
         }
         return Response(data=data, status=status.HTTP_200_OK)
-
 
 
 class Event:
