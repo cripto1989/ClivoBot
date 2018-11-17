@@ -15,19 +15,23 @@ import environ
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env = environ.Env(DEBUG=(bool, False),)
-env.read_env('environ.env')
+ROOT_DIR = environ.Path(__file__) - 2
 
+env = environ.Env()
+
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
+
+env.read_env(str(ROOT_DIR.path('environ.env')))
+# adjust the Python version in the line below as needed
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
-
+SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['a4bada5f.ngrok.io', '2ff4fe0c.ngrok.io']
+ALLOWED_HOSTS = ['54.184.105.62', 'ec2-54-184-105-62.us-west-2.compute.amazonaws.com', ]
 
 
 # Application definition
@@ -83,7 +87,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': env('DATABASE_DB'),
-        'USER': env('USER_DB'),
+        'USER':	env('USER_DB'),
         'PASSWORD': env('PASSWORD_DB'),
         'HOST': env('HOST_DB'),
         'PORT': env('PORT_DB'),
