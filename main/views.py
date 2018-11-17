@@ -3,7 +3,6 @@ import json
 import re
 import requests
 import string
-from django.db.models import Avg, Sum
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -144,10 +143,12 @@ class CallBackAPIView(APIView):
     def post(self, request, format=None):
         session = self.request.data['session']
         self.save_json(self.request.data, session)
+        # Principal request
         print(json.dumps(self.request.data))
         if "queryResult" in self.request.data:
             if "intent" in self.request.data["queryResult"]:
                 intent = self.request.data["queryResult"]["intent"]["displayName"]
+                # Intent
                 print(Fore.BLUE, intent)
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
                 if len(data_filter) > 0:
@@ -161,7 +162,7 @@ class CallBackAPIView(APIView):
                         chat = obj_dict['chat']
                         if chat > 0:
                             value = self.request.data["queryResult"]["parameters"][param]
-                            print(Fore.RED, value)
+                            # print(Fore.RED, value)
                             if validate:
                                 self.validate_data_daily_emotion(param, value, chat)
                             else:
@@ -169,7 +170,6 @@ class CallBackAPIView(APIView):
                         else:
                             if "parameters" in self.request.data["queryResult"]:
                                 value = self.request.data["queryResult"]["parameters"][param]
-                                print(Fore, "ando aca")
                                 if validate:
                                     self.validate_data(param, value)
                                 else:
@@ -184,12 +184,17 @@ class CallBackAPIView(APIView):
                                                            created__date=datetime.date.today())
         DailyEmotions.objects.filter(pk=obj.id).update(**{param: value})
 
-    def get_or_create_data(self):
-        obj, created = DataUser.objects.get_or_create(session_id=self.request.data['session'])
-        return obj
+    def get_or_create_data(self, slack_id):
+        try:
+            obj, created = DataUser.objects.get_or_create(slack=slack_id)
+            return obj
+        except Exception as e:
+            print('Error creando data user {}'.format(e))
 
     def update_data_user(self, parameter, value):
-        obj = self.get_or_create_data()
+        if 'originalDetectIntentRequest' in self.request.data:
+            slack_id = self.get_user_slack(self.request.data['originalDetectIntentRequest'])
+        obj = self.get_or_create_data(slack_id)
         DataUser.objects.filter(pk=obj.id).update(**{parameter: value})
 
     def validate_data(self, param, value):
@@ -208,8 +213,8 @@ class CallBackAPIView(APIView):
                 self.update_data_user(param, 3)
 
     def validate_data_daily_emotion(self, param, value, chat):
-        print(Fore.GREEN, param)
-        print(Fore.GREEN, value)
+        # print(Fore.GREEN, param)
+        # print(Fore.GREEN, value)
         if param == "emotion_neg":
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
             if value == "triste":
@@ -283,7 +288,7 @@ class CallBackAPIView(APIView):
         except Exception as e:
             return Response(data={'text':'User doesn\'t exists'}, status=status.HTTP_400_BAD_REQUEST)
         de = DailyEmotions.objects.filter(session_id=du.session_id, created__date=date)
-        print(de.count())
+        # print(de.count())
         alert_total = 0
         alerts_critical = 0
         alerts_non_critical = 0
@@ -332,25 +337,3 @@ class CallBackAPIView(APIView):
             "work_taste": work_taste
         }
         return Response(data=data, status=status.HTTP_200_OK)
-
-
-class Event:
-
-    @classmethod
-    def event(cls):
-        r = requests.post(
-            url="https://api.dialogflow.com/v1/",
-            headers={
-                "Authorization": "Bearer {}".format(DIALOG_ACCESS_TOKEN),
-                "Content-Type": "application/json"
-            },
-            data={
-                "v": "20150910",
-                "lang": "es",
-                "sessionId": "12345",
-                "timezone": "America/Chicago"
-            }
-        )
-        print(r)
-        print(r.status_code)
-        print(r.text)
