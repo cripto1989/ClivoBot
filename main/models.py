@@ -9,6 +9,7 @@ from django.contrib.postgres.fields import JSONField
 
 class DataUser(TimeStampedModel):
     session_id = models.CharField(max_length=400, blank=True, null=True)
+    slack = models.CharField(max_length=140, verbose_name='Slack ID')
     user_name = models.CharField(max_length=50, blank=True, null=True)
     jobcoach_name = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
