@@ -315,7 +315,7 @@ class CallBackAPIView(APIView):
             du = DataUser.objects.get(email=email)
         except Exception as e:
             return Response(data={'text':'User doesn\'t exists'}, status=status.HTTP_400_BAD_REQUEST)
-        de = DailyEmotions.objects.filter(session_id=du.session_id, created__date=date)
+        de = DailyEmotions.objects.filter(slack=du.slack, created__date=date)
         # print(de.count())
         alert_total = 0
         alerts_critical = 0
