@@ -203,17 +203,17 @@ class CallBackAPIView(APIView):
 
     def validate_data(self, param, value):
         if param == "user_gender":
-            if value.lower() == "masculino":
+            if value.lower() in ["masculino", "male"]:
                 self.update_data_user(param, 1)
-            elif value.lower() == "femenino":
+            elif value.lower() == ["femenino", "female"]:
                 self.update_data_user(param, 2)
         elif param == "emotion_neg":
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
-            if value == "triste":
+            if value.lower() in ["triste", "sad"]:
                 self.update_data_user(param, 2)
-            elif value == "frustrado":
+            elif value.lower() in ["frustrado", "frustrated"]:
                 self.update_data_user(param, 1)
-            elif value == "irritado":
+            elif value.lower() in ["irritado", "irritated"]:
                 self.update_data_user(param, 3)
 
     def validate_data_daily_emotion(self, param, value, chat):
@@ -229,17 +229,17 @@ class CallBackAPIView(APIView):
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
             print(param)
             print(value)
-            if value == "triste":
+            if value.lower() in ["triste", "sad"]:
                 self.create_emotion(param, 4, chat)
-            elif value == "frustrado":
+            elif value.lower() in ["frustrado", "frustrated"]:
                 self.create_emotion(param, 3, chat)
-            elif value == "irritado":
+            elif value.lower() == ["irritado", "irritated"]:
                 self.create_emotion(param, 5, chat)
         elif param == "emotions_pos":
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
-            if value == "feliz":
+            if value.lower() in ["feliz", "happy"]:
                 self.create_emotion(param, 1, chat)
-            elif value == "emocionado":
+            elif value.lower() in ["emocionado", "excited"]:
                 self.create_emotion(param, 2, chat)
         elif param == "alerts_non-critical":
             self.create_emotion("alerts_non_critical", value, chat)
