@@ -224,7 +224,7 @@ class CallBackAPIView(APIView):
             type_intent_previous = self.get_output_context(self.request.data['queryResult'])
             if type_intent_previous == 'i_starting_day-followup':
                 chat = 1
-            elif type_intent_previous == 'i_first_checkin-followup':
+            elif type_intent_previous in ['i_first_checkin-followup','i_starting_day_describe_problem-followup']:
                 chat = 2
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
             print(param)
