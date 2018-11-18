@@ -153,6 +153,7 @@ class CallBackAPIView(APIView):
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
                 if len(data_filter) > 0:
                     obj_dict = data_filter[0]
+                    param = ''
                     if 'param' in obj_dict:
                         for p in obj_dict['param']:
                             if p in self.request.data["queryResult"]["parameters"]:
@@ -160,27 +161,30 @@ class CallBackAPIView(APIView):
                                     param = p
                         validate = obj_dict['validate']
                         chat = obj_dict['chat']
-                        if chat > 0:
-                            value = self.request.data["queryResult"]["parameters"][param]
-                            # print(Fore.RED, value)
-                            if validate:
-                                self.validate_data_daily_emotion(param, value, chat)
+                        if len(param) > 0:
+                            if chat > 0:
+                                    value = self.request.data["queryResult"]["parameters"][param]
+                                    if validate:
+                                        self.validate_data_daily_emotion(param, value, chat)
+                                    else:
+                                        self.create_emotion(param, value, chat)
                             else:
-                                self.create_emotion(param, value, chat)
-                        else:
-                            if "parameters" in self.request.data["queryResult"]:
-                                value = self.request.data["queryResult"]["parameters"][param]
-                                if validate:
-                                    self.validate_data(param, value)
-                                else:
-                                    self.update_data_user(param, value)
+                                if "parameters" in self.request.data["queryResult"]:
+                                    value = self.request.data["queryResult"]["parameters"][param]
+                                    if validate:
+                                        self.validate_data(param, value)
+                                    else:
+                                        self.update_data_user(param, value)
 
         response = {
             "fulfillmentMessages": self.generate_response(data=self.request.data["queryResult"]["fulfillmentMessages"])}
         return Response(data=response, status=status.HTTP_200_OK, content_type="application/json; charset=UTF-8")
 
     def create_emotion(self, param, value, chat):
-        obj, created = DailyEmotions.objects.get_or_create(flow=chat, session_id=self.request.data['session'],
+        if 'originalDetectIntentRequest' in self.request.data:
+            slack_id = self.get_user_slack(self.request.data['originalDetectIntentRequest'])
+            print(Fore.RED, slack_id)
+        obj, created = DailyEmotions.objects.get_or_create(flow=chat, slack=slack_id,
                                                            created__date=datetime.date.today())
         DailyEmotions.objects.filter(pk=obj.id).update(**{param: value})
 
@@ -216,7 +220,15 @@ class CallBackAPIView(APIView):
         # print(Fore.GREEN, param)
         # print(Fore.GREEN, value)
         if param == "emotion_neg":
+            # We try to get the previous name intent and validate whit this.
+            type_intent_previous = self.get_output_context(self.request.data['queryResult'])
+            if type_intent_previous == 'i_starting_day-followup':
+                chat = 1
+            elif type_intent_previous == 'i_first_checkin-followup':
+                chat = 2
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
+            print(param)
+            print(value)
             if value == "triste":
                 self.create_emotion(param, 4, chat)
             elif value == "frustrado":
@@ -240,7 +252,9 @@ class CallBackAPIView(APIView):
         )
 
     def fetch_value(self, param):
-        obj = self.get_or_create_data()
+        if 'originalDetectIntentRequest' in self.request.data:
+            slack_id = self.get_user_slack(self.request.data['originalDetectIntentRequest'])
+        obj = self.get_or_create_data(slack_id)
         return getattr(obj, param)
 
     def generate_response(self, data):
@@ -279,6 +293,14 @@ class CallBackAPIView(APIView):
                         return user
                     elif isinstance(user, dict):
                         return user['id']
+
+    def get_output_context(self, data):
+        if 'outputContexts' in data:
+            if len(data['outputContexts']) > 0:
+                obj = data['outputContexts'][0]
+                name = obj['name']
+                name = name.split('/')[::-1][0]
+                return name
 
     def get(self, request):
         email = self.request.query_params.get('email')
