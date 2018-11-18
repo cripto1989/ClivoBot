@@ -285,14 +285,20 @@ class CallBackAPIView(APIView):
         :param data: dict originalDetectIntentRequest
         :return: ID slack DE21HHWR4
         """
+        user = None
         if 'payload' in data:
             if 'data' in data['payload']:
+                # El slack ID puede llegar en diferentes posiciones
                 if 'user' in data['payload']['data']:
                     user = data['payload']['data']['user']
-                    if isinstance(user, str):
-                        return user
-                    elif isinstance(user, dict):
-                        return user['id']
+                elif 'event' in data['payload']['data']:
+                    if 'user' in data['payload']['data']['event']:
+                        user = data['payload']['data']['event']['user']
+                if isinstance(user, str):
+                    return user
+                elif isinstance(user, dict):
+                    return user['id']
+
 
     def get_output_context(self, data):
         if 'outputContexts' in data:
