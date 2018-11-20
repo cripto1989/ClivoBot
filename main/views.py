@@ -233,7 +233,7 @@ class CallBackAPIView(APIView):
                 self.create_emotion(param, 4, chat)
             elif value.lower() in ["frustrado", "frustrated"]:
                 self.create_emotion(param, 3, chat)
-            elif value.lower() == ["irritado", "irritated"]:
+            elif value.lower() in ["irritado", "irritated"]:
                 self.create_emotion(param, 5, chat)
         elif param == "emotions_pos":
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
