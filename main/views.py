@@ -327,6 +327,7 @@ class CallBackAPIView(APIView):
         emotion_1hr = ""
         emotion_2hr = ""
         work_taste = None
+        print(work_taste)
         for daily in de:
             if isinstance(daily.alerts_total, str):
                 alert_total += int(daily.alerts_total)
@@ -351,9 +352,12 @@ class CallBackAPIView(APIView):
                 if daily.emotions_pos or daily.emotion_neg:
                     emotion_2hr = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
                 if daily.second_dislike:
+                    print('Es false')
                     work_taste = False
-                else:
+                if daily.emotions_pos in [DailyEmotions.EMOTION.emotion_happy, DailyEmotions.EMOTION.emotion_excited]:
+                    print('Es true')
                     work_taste = True
+        print(work_taste)
         data = {
             "alert_total": alert_total,
             "alerts_critical": alerts_critical,
