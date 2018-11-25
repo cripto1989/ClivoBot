@@ -14,3 +14,5 @@ __pycache__/
 ClivoBot/wsgi.py
 
 .vscode/
+
+credentials.json

@@ -1,14 +1,14 @@
 import firebase_admin 
 from firebase_admin import credentials
 from firebase_admin import db
+from django.conf.settings import FIREBASE_APP_CLIVO
 
-cred = credentials.Certificate('clivoapp-firebase-adminsdk-spp16-b47d63d943.json')
+cred = credentials.Certificate('credentials.json')
 firebase_admin.initialize_app(cred, {
-   'databaseURL': 'https://clivoapp.firebaseio.com/'
+   'databaseURL': FIREBASE_APP_CLIVO
 })
 
-# As an admin, the app has access to read and write all data, regradless of Security Rules
 ref = db.reference('Users')
-print(ref.get())
-#print(ref)
+data = ref.get()
+print(json.loads(data))
 
