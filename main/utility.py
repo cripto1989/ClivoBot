@@ -15,6 +15,7 @@ class SendGrid:
         :param coach_email: Coach Email e.g email@domain.com
         :return None 
         """
+        member = member.title()
         try:
             send_mail(
                 'Un miembro necesita ayuda',

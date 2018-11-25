@@ -11,6 +11,8 @@ from colorama import Fore, init
 
 from ClivoBot.settings import DIALOG_ACCESS_TOKEN
 from main.models import History, DataUser, DailyEmotions
+from main.firebase import CustomFirebase
+from main.utility import SendGrid
 
 init()
 
@@ -148,6 +150,13 @@ class CallBackAPIView(APIView):
         if "queryResult" in self.request.data:
             if "intent" in self.request.data["queryResult"]:
                 intent = self.request.data["queryResult"]["intent"]["displayName"]
+                if intent == 'i_greetings':
+                    slack_id = self.get_user_slack(self.request.data['originalDetectIntentRequest'])
+                    du = DataUser.objects.filter(slack=slack_id)
+                    if du.count() > 0:
+                        du = du.last()
+                        email = CustomFirebase.get_coach_email(du.jobcoach_name)                        
+                        SendGrid.send_notification_coach(du.user_name, email)
                 # Intent
                 print(Fore.BLUE, intent)
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
