@@ -12,3 +12,5 @@ __pycache__/
 
 ### WSGI
 ClivoBot/wsgi.py
+
+.vscode/
