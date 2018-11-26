@@ -3,9 +3,9 @@ from firebase_admin import credentials
 from firebase_admin import db
 from django.conf import settings
 
-cred = credentials.Certificate('credentials.json')
+cred = credentials.Certificate('{}/credentials.json'.format(settings.ROOT_DIR))
 firebase_admin.initialize_app(cred, {
-   'databaseURL': settings.FIREBASE_APP_CLIVO
+   'databaseURL': settings.FIREBASE_APP_CLIVO,
 })
 
 class CustomFirebase:
