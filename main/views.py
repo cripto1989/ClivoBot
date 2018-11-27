@@ -155,8 +155,9 @@ class CallBackAPIView(APIView):
                     du = DataUser.objects.filter(slack=slack_id)
                     if du.count() > 0:
                         du = du.last()
-                        email = CustomFirebase.get_coach_email(du.jobcoach_name)                        
-                        SendGrid.send_notification_coach(du.user_name, email)
+                        list_emails = CustomFirebase.get_coach_email(du.email)
+                        if len(list_emails) > 0:                        
+                            SendGrid.send_notification_coach(du.user_name, list_emails)
                 # Intent
                 print(Fore.BLUE, intent)
                 data_filter = list(filter(lambda dict_intent: dict_intent['intent'] == intent, self.INTENTS))
