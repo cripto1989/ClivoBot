@@ -19,7 +19,7 @@ class SendGrid:
         try:
             send_mail(
                 'A member needs your help',
-                f'The member "{member}" needs your support, give assistance immediateley, please.',
+                f'The member "{member}" needs your support, give assistance immediately, please.',
                 settings.EMAIL_HOST_USER,
                 list_emails,
                 fail_silently=False,
