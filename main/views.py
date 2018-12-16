@@ -399,6 +399,7 @@ class WeekMonthAPIView(APIView):
             'alerts_friday': 0,
             'alerts_saturday': 0,
             'alerts_sunday': 0,
+            'work_opinions': []
         }
 
         email = self.request.query_params.get('email')
@@ -413,6 +414,7 @@ class WeekMonthAPIView(APIView):
             # print(queryset.count())
 
         for daily_emotion in queryset:
+            #
             if daily_emotion.emotions_pos:
                 if daily_emotion.emotions_pos == 1:
                     data['happy'] += 1
@@ -425,6 +427,13 @@ class WeekMonthAPIView(APIView):
                     data['sad'] += 1
                 elif daily_emotion.emotion_neg == 5:
                     data['irritated'] += 1
+            #
+            if isinstance(daily_emotion.initial_change, str):
+                data['work_opinions'].append(daily_emotion.initial_change)
+            if isinstance(daily_emotion.first_problem, str):
+                data['work_opinions'].append(daily_emotion.first_problem)
+            if isinstance(daily_emotion.second_dislike, str):
+                data['work_opinions'].append(daily_emotion.second_dislike)
         queryset_alerts = queryset.filter(flow=DailyEmotions.FLOW.second_check_in)
         for daily_emotion_alerts in queryset_alerts:
             print(daily_emotion_alerts.created)
