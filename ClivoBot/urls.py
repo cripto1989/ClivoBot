@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import CallBackAPIView
+from main.views import CallBackAPIView, WeekMonthAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/test', CallBackAPIView.as_view(), name='callback'),
+    path('api/data', WeekMonthAPIView.as_view(), name='data')
 ]

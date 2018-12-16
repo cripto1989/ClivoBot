@@ -1,7 +1,6 @@
 import datetime
 import json
 import re
-import requests
 import string
 
 from rest_framework.views import APIView
@@ -9,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from colorama import Fore, init
 
-from ClivoBot.settings import DIALOG_ACCESS_TOKEN
 from main.models import History, DataUser, DailyEmotions
 from main.firebase import CustomFirebase
 from main.utility import SendGrid
@@ -155,7 +153,8 @@ class CallBackAPIView(APIView):
                     du = DataUser.objects.filter(slack=slack_id)
                     if du.count() > 0:
                         du = du.last()
-                        list_emails = list(set(CustomFirebase.get_coach_email(du.email)+CustomFirebase.get_participants_email(du.email))) 
+                        list_emails = list(set(
+                            CustomFirebase.get_coach_email(du.email) + CustomFirebase.get_participants_email(du.email)))
                         if len(list_emails) > 0:
                             print(list_emails)
                             SendGrid.send_notification_coach(du.user_name, list_emails)
@@ -174,11 +173,11 @@ class CallBackAPIView(APIView):
                         chat = obj_dict['chat']
                         if len(param) > 0:
                             if chat > 0:
-                                    value = self.request.data["queryResult"]["parameters"][param]
-                                    if validate:
-                                        self.validate_data_daily_emotion(param, value, chat)
-                                    else:
-                                        self.create_emotion(param, value, chat)
+                                value = self.request.data["queryResult"]["parameters"][param]
+                                if validate:
+                                    self.validate_data_daily_emotion(param, value, chat)
+                                else:
+                                    self.create_emotion(param, value, chat)
                             else:
                                 if "parameters" in self.request.data["queryResult"]:
                                     value = self.request.data["queryResult"]["parameters"][param]
@@ -235,7 +234,7 @@ class CallBackAPIView(APIView):
             type_intent_previous = self.get_output_context(self.request.data['queryResult'])
             if type_intent_previous == 'i_starting_day-followup':
                 chat = 1
-            elif type_intent_previous in ['i_first_checkin-followup','i_starting_day_describe_problem-followup']:
+            elif type_intent_previous in ['i_first_checkin-followup', 'i_starting_day_describe_problem-followup']:
                 chat = 2
             value = ''.join([i for i in value.lower() if i in string.ascii_lowercase]).strip()
             print(param)
@@ -310,7 +309,6 @@ class CallBackAPIView(APIView):
                 elif isinstance(user, dict):
                     return user['id']
 
-
     def get_output_context(self, data):
         if 'outputContexts' in data:
             if len(data['outputContexts']) > 0:
@@ -325,7 +323,7 @@ class CallBackAPIView(APIView):
         try:
             du = DataUser.objects.get(email=email)
         except Exception as e:
-            return Response(data={'text':'User doesn\'t exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'text': 'User doesn\'t exists'}, status=status.HTTP_400_BAD_REQUEST)
         de = DailyEmotions.objects.filter(slack=du.slack, created__date=date)
         # print(de.count())
         alert_total = 0
@@ -381,4 +379,42 @@ class CallBackAPIView(APIView):
             "emotion_2hr": emotion_2hr,
             "work_taste": work_taste
         }
+        return Response(data=data, status=status.HTTP_200_OK)
+
+
+class WeekMonthAPIView(APIView):
+
+    def get(self, request):
+        email = self.request.query_params.get('email')
+        month = self.request.query_params.get('month')
+        week = self.request.query_params.get('week')
+        data_user = DataUser.objects.get(email=email)
+
+        if month:
+            queryset = DailyEmotions.objects.filter(created__month=month, slack=data_user.slack)
+        if week:
+            queryset = DailyEmotions.objects.filter(created__week=week, slack=data_user.slack)
+
+        data = {
+            'happy': 0,
+            'excited': 0,
+            'frustrated': 0,
+            'sad': 0,
+            'irritated': 0
+        }
+
+        for daily_emotion in queryset:
+            if daily_emotion.emotions_pos:
+                if daily_emotion.emotions_pos == 1:
+                    data['happy'] += 1
+                elif daily_emotion.emotions_pos == 2:
+                    data['excited'] += 1
+            if daily_emotion.emotion_neg:
+                if daily_emotion.emotion_neg == 3:
+                    data['frustrated'] += 1
+                elif daily_emotion.emotion_neg == 4:
+                    data['sad'] += 1
+                elif daily_emotion.emotion_neg == 5:
+                    data['irritated'] += 1
+
         return Response(data=data, status=status.HTTP_200_OK)
