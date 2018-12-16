@@ -411,6 +411,26 @@ class WeekMonthAPIView(APIView):
             queryset = queryset.filter(created__month=month)
         if week:
             queryset = queryset.filter(created__week=week)
+            queryset_alerts = queryset.filter(flow=DailyEmotions.FLOW.second_check_in)
+            for daily_emotion_alerts in queryset_alerts:
+                print(daily_emotion_alerts.created)
+                print(daily_emotion_alerts.created.date().weekday())
+                alerts_total = int(daily_emotion_alerts.alerts_critical) + int(
+                    daily_emotion_alerts.alerts_non_critical) + int(daily_emotion_alerts.alerts_total)
+                if daily_emotion_alerts.created.date().weekday() == 0:
+                    data['alerts_monday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 1:
+                    data['alerts_tuesday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 2:
+                    data['alerts_wednesday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 3:
+                    data['alerts_thursday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 4:
+                    data['alerts_friday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 5:
+                    data['alerts_saturday'] = alerts_total
+                elif daily_emotion_alerts.created.date().weekday() == 6:
+                    data['alerts_sunday'] = alerts_total
             # print(queryset.count())
 
         for daily_emotion in queryset:
@@ -434,24 +454,6 @@ class WeekMonthAPIView(APIView):
                 data['work_opinions'].append(daily_emotion.first_problem)
             if isinstance(daily_emotion.second_dislike, str):
                 data['work_opinions'].append(daily_emotion.second_dislike)
-        queryset_alerts = queryset.filter(flow=DailyEmotions.FLOW.second_check_in)
-        for daily_emotion_alerts in queryset_alerts:
-            print(daily_emotion_alerts.created)
-            print(daily_emotion_alerts.created.date().weekday())
-            alerts_total = int(daily_emotion_alerts.alerts_critical) + int(
-                daily_emotion_alerts.alerts_non_critical) + int(daily_emotion_alerts.alerts_total)
-            if daily_emotion_alerts.created.date().weekday() == 0:
-                data['alerts_monday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 1:
-                data['alerts_tuesday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 2:
-                data['alerts_wednesday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 3:
-                data['alerts_thursday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 4:
-                data['alerts_friday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 5:
-                data['alerts_saturday'] = alerts_total
-            elif daily_emotion_alerts.created.date().weekday() == 6:
-                data['alerts_sunday'] = alerts_total
+
+
         return Response(data=data, status=status.HTTP_200_OK)
