@@ -385,23 +385,32 @@ class CallBackAPIView(APIView):
 class WeekMonthAPIView(APIView):
 
     def get(self, request):
-        email = self.request.query_params.get('email')
-        month = self.request.query_params.get('month')
-        week = self.request.query_params.get('week')
-        data_user = DataUser.objects.get(email=email)
-
-        if month:
-            queryset = DailyEmotions.objects.filter(created__month=month, slack=data_user.slack)
-        if week:
-            queryset = DailyEmotions.objects.filter(created__week=week, slack=data_user.slack)
 
         data = {
             'happy': 0,
             'excited': 0,
             'frustrated': 0,
             'sad': 0,
-            'irritated': 0
+            'irritated': 0,
+            'alerts_monday': 0,
+            'alerts_tuesday': 0,
+            'alerts_wednesday': 0,
+            'alerts_thursday': 0,
+            'alerts_friday': 0,
+            'alerts_saturday': 0,
+            'alerts_sunday': 0,
         }
+
+        email = self.request.query_params.get('email')
+        month = self.request.query_params.get('month')
+        week = self.request.query_params.get('week')
+        data_user = DataUser.objects.get(email=email)
+        queryset = DailyEmotions.objects.filter(slack=data_user.slack)
+        if month:
+            queryset = queryset.filter(created__month=month)
+        if week:
+            queryset = queryset.filter(created__week=week)
+            # print(queryset.count())
 
         for daily_emotion in queryset:
             if daily_emotion.emotions_pos:
@@ -416,5 +425,24 @@ class WeekMonthAPIView(APIView):
                     data['sad'] += 1
                 elif daily_emotion.emotion_neg == 5:
                     data['irritated'] += 1
-
+        queryset_alerts = queryset.filter(flow=DailyEmotions.FLOW.second_check_in)
+        for daily_emotion_alerts in queryset_alerts:
+            print(daily_emotion_alerts.created)
+            print(daily_emotion_alerts.created.date().weekday())
+            alerts_total = int(daily_emotion_alerts.alerts_critical) + int(
+                daily_emotion_alerts.alerts_non_critical) + int(daily_emotion_alerts.alerts_total)
+            if daily_emotion_alerts.created.date().weekday() == 0:
+                data['alerts_monday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 1:
+                data['alerts_tuesday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 2:
+                data['alerts_wednesday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 3:
+                data['alerts_thursday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 4:
+                data['alerts_friday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 5:
+                data['alerts_saturday'] = alerts_total
+            elif daily_emotion_alerts.created.date().weekday() == 6:
+                data['alerts_sunday'] = alerts_total
         return Response(data=data, status=status.HTTP_200_OK)
