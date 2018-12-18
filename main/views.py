@@ -411,10 +411,15 @@ class WeekMonthAPIView(APIView):
             queryset = queryset.filter(created__month=month)
         if week:
             queryset = queryset.filter(created__week=week)
+            date = queryset.last().created
+            start_day = date - datetime.timedelta(days=date.weekday())
+            end_day = start_day + datetime.timedelta(days=6)
+            data['start_week'] = start_day.date()
+            data['end_week'] = end_day.date()
             queryset_alerts = queryset.filter(flow=DailyEmotions.FLOW.second_check_in)
             for daily_emotion_alerts in queryset_alerts:
-                print(daily_emotion_alerts.created)
-                print(daily_emotion_alerts.created.date().weekday())
+                # print(daily_emotion_alerts.created)
+                # print(daily_emotion_alerts.created.date().weekday())
                 alerts_total = int(daily_emotion_alerts.alerts_critical) + int(
                     daily_emotion_alerts.alerts_non_critical) + int(daily_emotion_alerts.alerts_total)
                 if daily_emotion_alerts.created.date().weekday() == 0:
@@ -454,6 +459,5 @@ class WeekMonthAPIView(APIView):
                 data['work_opinions'].append(daily_emotion.first_problem)
             if isinstance(daily_emotion.second_dislike, str):
                 data['work_opinions'].append(daily_emotion.second_dislike)
-
 
         return Response(data=data, status=status.HTTP_200_OK)
