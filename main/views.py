@@ -1,3 +1,4 @@
+import calendar
 import datetime
 import json
 import re
@@ -405,10 +406,31 @@ class WeekMonthAPIView(APIView):
         email = self.request.query_params.get('email')
         month = self.request.query_params.get('month')
         week = self.request.query_params.get('week')
+        year = self.request.query_params.get('year')
         data_user = DataUser.objects.get(email=email)
         queryset = DailyEmotions.objects.filter(slack=data_user.slack)
-        if month:
-            queryset = queryset.filter(created__month=month)
+        if month and year:
+            month = int(month)
+            year = int(year)
+            queryset = queryset.filter(created__month=month,flow=DailyEmotions.FLOW.second_check_in)
+            weeks = []
+            for num_week, curent_week in enumerate(calendar.monthcalendar(year, month), 1):
+                curent_week = list(filter(lambda x: x > 0, curent_week))
+                start_day = f'{year}-{month}-{curent_week[0]}'
+                end_day = f'{year}-{month}-{curent_week[len(curent_week) - 1]}'
+                queryset_week = queryset.filter(created__range=(start_day,end_day))
+                alerts = 0
+                for daily_emotion in queryset_week:
+                    alerts += int(daily_emotion.alerts_critical) + int(
+                        daily_emotion.alerts_non_critical) + int(daily_emotion.alerts_total)
+                #print(queryset_week.count())
+                weeks.append({
+                    'week': num_week,
+                    'alerts':alerts
+                })
+                # print(f'Num week: {num_week}')
+                # print(list(filter(lambda x: x > 0, curent_week)))
+            data['weeks'] = weeks
         if week:
             queryset = queryset.filter(created__week=week)
             date = queryset.last().created
