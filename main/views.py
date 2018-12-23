@@ -138,6 +138,24 @@ class CallBackAPIView(APIView):
             'intent': 'i_response_again',
             'validate': False,
             'chat': 0
+        },
+        # End weekend
+        {
+            'intent': 'i_endofweek_ask_stay',
+            'validate': True,
+            'chat': 4
+        },
+        {
+            'intent': 'i_endofweek_ask_stay_yes_farewell',
+            'validate': True,
+            'param': ['another-week_yes'],
+            'chat': 4
+        },
+        {
+            'intent': 'i_endofweek_ask_stay_yes',
+            'validate': True,
+            'param': ['another-week_yes'],
+            'chat': 4
         }
     ]
 
@@ -228,8 +246,8 @@ class CallBackAPIView(APIView):
                 self.update_data_user(param, 3)
 
     def validate_data_daily_emotion(self, param, value, chat):
-        # print(Fore.GREEN, param)
-        # print(Fore.GREEN, value)
+        print(Fore.GREEN, param)
+        print(Fore.GREEN, value)
         if param == "emotion_neg":
             # We try to get the previous name intent and validate whit this.
             type_intent_previous = self.get_output_context(self.request.data['queryResult'])
@@ -255,7 +273,16 @@ class CallBackAPIView(APIView):
         elif param == "alerts_non-critical":
             self.create_emotion("alerts_non_critical", value, chat)
         elif param == "second_dislike":
-            self.create_emotion("second_dislike", value, chat)
+            type_intent_previous = self.get_output_context(self.request.data['queryResult'])
+            if type_intent_previous == 'i_endofweek_ask_stay-followup':
+                chat = 4
+                self.create_emotion('another_week_no', value, chat)
+            else:
+                self.create_emotion("second_dislike", value, chat)
+        elif param == 'another-week_yes':
+            self.create_emotion("another_week_yes", value, chat)
+        elif param == 'another-week_no':
+            self.create_emotion("another_week_no", value, chat)
 
     def save_json(self, json_data, session):
         History.objects.create(

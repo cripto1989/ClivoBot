@@ -46,6 +46,8 @@ class DailyEmotions(TimeStampedModel):
     alerts_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Criticals")
     alerts_non_critical = models.CharField(max_length=10, blank=True, null=True, verbose_name="Alerts Non-Critial")
     second_dislike = models.TextField(max_length=500, blank=True, null=True, verbose_name="Work Dislike")
+    another_week_yes = models.CharField(max_length=40, blank=True, null=True, verbose_name='Another Week Yes')
+    another_week_no = models.CharField(max_length=40, blank=True, null=True, verbose_name='Another Week No')
     session_id = models.TextField(blank=True, null=True)
     slack = models.CharField(max_length=140, verbose_name='Slack ID')
 
