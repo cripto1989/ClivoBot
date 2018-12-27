@@ -389,10 +389,8 @@ class CallBackAPIView(APIView):
                 if daily.emotions_pos or daily.emotion_neg:
                     emotion_2hr = DailyEmotions.EMOTION[daily.emotions_pos or daily.emotion_neg]
                 if daily.second_dislike:
-                    print('Es false')
                     work_taste = False
                 if daily.emotions_pos in [DailyEmotions.EMOTION.emotion_happy, DailyEmotions.EMOTION.emotion_excited]:
-                    print('Es true')
                     work_taste = True
         print(work_taste)
         data = {
@@ -436,13 +434,14 @@ class WeekMonthAPIView(APIView):
         year = self.request.query_params.get('year')
         data_user = DataUser.objects.get(email=email)
         queryset = DailyEmotions.objects.filter(slack=data_user.slack)
+
         if month and year:
             month = int(month)
             year = int(year)
             data['weekend_yes'] = None
             data['weekend_no'] = None
             data['comment_weekend'] = []
-            queryset_weekend = queryset.filter(flow=4)
+            queryset_weekend = queryset.filter(created__month=month, created__year=year, flow=4)
             if queryset_weekend.count() > 0:
                 data['weekend_yes'] = len([True for weekend in queryset_weekend if weekend.another_week_yes])
                 data['weekend_no'] = len([True for weekend in queryset_weekend if weekend.another_week_no])
@@ -452,6 +451,15 @@ class WeekMonthAPIView(APIView):
                         data['comment_weekend'].append(weekend.another_week_yes)
                     elif weekend.another_week_no:
                         data['comment_weekend'].append(weekend.another_week_no)
+
+            queryset_second = queryset.filter(created__month=month, created__year=year)
+            data['work_taste_neg'] = 0
+            data['work_taste_pos'] = 0
+            for second in queryset_second:
+                if second.second_dislike:
+                    data['work_taste_neg'] += 1
+                if second.emotions_pos in [DailyEmotions.EMOTION.emotion_happy, DailyEmotions.EMOTION.emotion_excited]:
+                    data['work_taste_pos'] += 1
 
             queryset = queryset.filter(created__month=month, flow=DailyEmotions.FLOW.second_check_in)
             weeks = []
@@ -485,6 +493,15 @@ class WeekMonthAPIView(APIView):
                 elif queryset_weekend.another_week_no:
                     data['weekend'] = False
                     data['comment_weekend'] = queryset_weekend.another_week_no
+
+            queryset_second = queryset.filter(created__week=week, flow=DailyEmotions.FLOW.second_check_in)
+            data['work_taste_neg'] = 0
+            data['work_taste_pos'] = 0
+            for second in queryset_second:
+                if second.second_dislike:
+                    data['work_taste_neg'] += 1
+                if second.emotions_pos in [DailyEmotions.EMOTION.emotion_happy, DailyEmotions.EMOTION.emotion_excited]:
+                    data['work_taste_pos'] += 1
 
             queryset = queryset.filter(created__week=week)
             if queryset.count() > 0:
