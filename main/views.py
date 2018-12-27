@@ -439,6 +439,20 @@ class WeekMonthAPIView(APIView):
         if month and year:
             month = int(month)
             year = int(year)
+            data['weekend_yes'] = None
+            data['weekend_no'] = None
+            data['comment_weekend'] = []
+            queryset_weekend = queryset.filter(flow=4)
+            if queryset_weekend.count() > 0:
+                data['weekend_yes'] = len([True for weekend in queryset_weekend if weekend.another_week_yes])
+                data['weekend_no'] = len([True for weekend in queryset_weekend if weekend.another_week_no])
+
+                for weekend in queryset_weekend:
+                    if weekend.another_week_yes:
+                        data['comment_weekend'].append(weekend.another_week_yes)
+                    elif weekend.another_week_no:
+                        data['comment_weekend'].append(weekend.another_week_no)
+
             queryset = queryset.filter(created__month=month, flow=DailyEmotions.FLOW.second_check_in)
             weeks = []
             for num_week, curent_week in enumerate(calendar.monthcalendar(year, month), 1):
@@ -459,6 +473,19 @@ class WeekMonthAPIView(APIView):
                 # print(list(filter(lambda x: x > 0, curent_week)))
             data['weeks'] = weeks
         if week:
+
+            queryset_weekends = queryset.filter(created__week=week, flow=4)
+            data['weekend'] = None
+            data['comment_weekend'] = None
+            if queryset_weekends.count() > 0:
+                queryset_weekend = queryset_weekends.last()
+                if queryset_weekend.another_week_yes:
+                    data['weekend'] = True
+                    data['comment_weekend'] = queryset_weekend.another_week_yes
+                elif queryset_weekend.another_week_no:
+                    data['weekend'] = False
+                    data['comment_weekend'] = queryset_weekend.another_week_no
+
             queryset = queryset.filter(created__week=week)
             if queryset.count() > 0:
                 date = queryset.last().created
@@ -512,16 +539,4 @@ class WeekMonthAPIView(APIView):
             if isinstance(daily_emotion.second_dislike, str):
                 data['work_opinions'].append(daily_emotion.second_dislike)
 
-        queryset_weekends = queryset.filter(created__week=week, flow=4)
-        print(queryset_weekends.count())
-        data['weekend'] = None
-        data['comment_weekend']=None
-        if queryset_weekends.count() > 0:
-            queryset_weekend = queryset_weekends.last()
-            if queryset_weekend.another_week_yes:
-                data['weekend'] = True
-                data['comment_weekend']=queryset_weekend.another_week_yes
-            elif queryset_weekend.another_week_no:
-                data['weekend'] = False
-                data['comment_weekend'] = queryset_weekend.another_week_no
         return Response(data=data, status=status.HTTP_200_OK)
