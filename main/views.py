@@ -514,9 +514,14 @@ class WeekMonthAPIView(APIView):
 
         queryset_weekends = queryset.filter(created__week=week, flow=4)
         print(queryset_weekends.count())
+        data['weekend'] = None
+        data['comment_weekend']=None
         if queryset_weekends.count() > 0:
             queryset_weekend = queryset_weekends.last()
-            print(queryset_weekend.another_week_yes)
-            print(queryset_weekend.another_week_no)
-
+            if queryset_weekend.another_week_yes:
+                data['weekend'] = True
+                data['comment_weekend']=queryset_weekend.another_week_yes
+            elif queryset_weekend.another_week_no:
+                data['weekend'] = False
+                data['comment_weekend'] = queryset_weekend.another_week_no
         return Response(data=data, status=status.HTTP_200_OK)
